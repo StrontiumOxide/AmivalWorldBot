@@ -74,7 +74,7 @@ async def get_status_caption(message: tp. Message, state: FSMContext) -> None:
 
     if message.text == 'Нет ❌':
         await message.answer(
-            text='Отлично, ты хочешь чтобы твой пост выложили анонимно или не анонимно? 🧐',
+            text='Ладно. Как ты хочешь чтобы выложили твой пост? 🥸',
             reply_markup=kb.reply.anonymously_kb
         )
         
@@ -83,7 +83,7 @@ async def get_status_caption(message: tp. Message, state: FSMContext) -> None:
         return
 
     await message.answer(
-        text='Напиши описание к видео/фото 💬 (не более 1024 символов)',
+        text='Напиши описание к своему посту 💬 (не более 1024 символов)',
         reply_markup=kb.reply.remove
     )
     
@@ -106,7 +106,7 @@ async def get_caption(message: tp. Message, state: FSMContext) -> None:
     await state.update_data(caption=message.text)
 
     await message.answer(
-        text='Отлично, ты хочешь чтобы твой пост выложили анонимно или не анонимно? 🧐',
+        text='Ладно. Как ты хочешь чтобы выложили твой пост? 🥸',
         reply_markup=kb.reply.anonymously_kb
     )
 
@@ -120,28 +120,27 @@ async def get_author_and_mailing(message: tp. Message, state: FSMContext, bot: B
     Данная корутина получает информацию об анонимности пользователя.
     '''
 
-    if message.text not in ['Анонимно 😈', 'Не анонимно 🌟']:
+    if message.text not in ['Анонимно 🥷', 'Не анонимно 👀']:
         await message.answer(
-            text='Мне нужен ответ "<b>Анонимно 😈</b>" или "<b>Не анонимно 🌟</b>" 😉',
+            text='Мне нужен ответ "<b>Анонимно 🥷</b>" или "<b>Не анонимно 👀</b>" 😉',
             reply_markup=kb.reply.anonymously_kb
         )
         return
     
-    if message.text == 'Анонимно 😈':
+    if message.text == 'Анонимно 🥷':
         await state.update_data(
             first_name='аноним'
         )
 
     else:
         await state.update_data(
-            first_name=message.from_user.first_name,
-            last_name=message.from_user.last_name,
+            full_name=message.from_user.full_name,
             username=message.from_user.username
         )
 
     await message.answer(
-        text='Спасибо, твой пост скоро окажется на канале 😌\n\
-Для повторного отправления поста введите команду /share_content ℹ️',
+        text='Хорошо, скоро твой пост окажется на канале 💥\n\
+Чтобы отправить новый контент введите команду /share_content 🛜',
         reply_markup=kb.reply.remove
     )
 
@@ -154,7 +153,7 @@ async def get_author_and_mailing(message: tp. Message, state: FSMContext, bot: B
     if data.get('first_name') == 'аноним':
         name = 'Аноним'
     else:
-        name = f"{data.get('first_name')} {data.get('last_name')} (@{data.get('username')})"
+        name = f"{data.get('full_name')} (@{data.get('username')})"
 
     for user_id in list_admin:
 
@@ -166,7 +165,7 @@ async def get_author_and_mailing(message: tp. Message, state: FSMContext, bot: B
 
         await bot.send_message(
             chat_id=user_id,
-            text='<b>ВНИМАНИЕ ⚠️</b>\nНовый контент!'
+            text='<b>⚠️ ВНИМАНИЕ ⚠️</b> <i>Новый контент!</i>'
         )
         
         if category == 'photo':

@@ -17,7 +17,7 @@ async def command_start_handler(message: tp.Message) -> None:
 
 Это предложка канала <b>Animal World | MLBB</b> 🦁
 
-Чтобы предложить свой пост введи команду /share_content ℹ️
+Чтобы предложить свой пост введи команду /share_content 🛜
 '''
     
     await message.answer_photo(

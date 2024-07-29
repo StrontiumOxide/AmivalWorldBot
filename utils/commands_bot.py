@@ -10,11 +10,11 @@ async def set_commands(bot: Bot) -> None:
     commands = [
         BotCommand(
             command="start",
-            description="Запуск бота ⚠️"
+            description="Запуск бота 🔄"
         ),
         BotCommand(
             command="share_content",
-            description="Поделиться контентом ℹ️"
+            description="Поделиться контентом 🛜"
         ),
     ]
 
