@@ -13,4 +13,4 @@ class ContentData(StatesGroup):
     author = State()
 
     full_name = State()
-    username = State()
+    

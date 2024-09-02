@@ -7,6 +7,7 @@ from TelegramMainLogic.GetData import kb_get_data as kb
 
 router = Router()
 
+
 @router.message(Command(commands=['share_content']))
 async def introduction(message: tp.Message, state: FSMContext) -> None:
 
@@ -27,7 +28,7 @@ async def introduction(message: tp.Message, state: FSMContext) -> None:
 
 
 @router.message(ContentData.file)
-async def get_media(message: tp. Message, state: FSMContext) -> None:
+async def get_media(message: tp.Message, state: FSMContext) -> None:
 
     '''
     Данная корутина будет получает медиафайлы от пользователей
@@ -59,7 +60,7 @@ async def get_media(message: tp. Message, state: FSMContext) -> None:
 
 
 @router.message(ContentData.status_caption)
-async def get_status_caption(message: tp. Message, state: FSMContext) -> None:
+async def get_status_caption(message: tp.Message, state: FSMContext) -> None:
 
     '''
     Данная корутина будет получать подтверждение на создания подписи к контенту.
@@ -91,7 +92,7 @@ async def get_status_caption(message: tp. Message, state: FSMContext) -> None:
 
 
 @router.message(ContentData.caption)
-async def get_caption(message: tp. Message, state: FSMContext) -> None:
+async def get_caption(message: tp.Message, state: FSMContext) -> None:
 
     '''
     Данная корутина будет получать подпись к контенту.
@@ -114,7 +115,7 @@ async def get_caption(message: tp. Message, state: FSMContext) -> None:
 
 
 @router.message(ContentData.author)
-async def get_author_and_mailing(message: tp. Message, state: FSMContext, bot: Bot) -> None:
+async def get_author(message: tp.Message, state: FSMContext) -> None:
 
     '''
     Данная корутина получает информацию об анонимности пользователя.
@@ -129,14 +130,41 @@ async def get_author_and_mailing(message: tp. Message, state: FSMContext, bot: B
     
     if message.text == 'Анонимно 🥷':
         await state.update_data(
-            first_name='аноним'
+            full_name='аноним'
         )
-
     else:
-        await state.update_data(
-            full_name=message.from_user.full_name,
-            username=message.from_user.username
+        await message.answer(
+            text='Напиши свой никнейм 🔥',
+            reply_markup=kb.builder.created_username_kb(username=message.from_user.username)
         )
+        await state.set_state(ContentData.full_name)
+        return
+        
+    await message.answer(
+        text='Хорошо, скоро твой пост окажется на канале 💥\n\
+Чтобы отправить новый контент введите команду /share_content 🛜',
+        reply_markup=kb.reply.remove
+    )
+
+    await mailing_admin(state=state, bot=message.bot)
+
+
+@router.message(ContentData.full_name)
+async def get_full_name(message: tp.Message, state: FSMContext) -> None:
+
+    '''
+    Данная корутина получает информацию об анонимности пользователя.
+    '''
+
+    if not message.text:
+        await message.answer(
+            text='Ваше сообщение не содержит текст 😒'
+        )
+        return
+
+    await state.update_data(
+        full_name=message.text
+    )
 
     await message.answer(
         text='Хорошо, скоро твой пост окажется на канале 💥\n\
@@ -144,16 +172,24 @@ async def get_author_and_mailing(message: tp. Message, state: FSMContext, bot: B
         reply_markup=kb.reply.remove
     )
 
-        # Процесс рассылки постов админам.
+    await mailing_admin(state=state, bot=message.bot)
+
+
+async def mailing_admin(state: FSMContext, bot: Bot) -> None:
+
+    """
+    Корутина по рассылке уведомлений админам о новых постах
+    """
+
     data: dict = await state.get_data()
 
     file_id = data.get('file')
     category = data.get('category')
 
-    if data.get('first_name') == 'аноним':
+    if data.get('full_name') == 'аноним':
         name = 'Аноним'
     else:
-        name = f"{data.get('full_name')} (@{data.get('username')})"
+        name = f"{data.get('full_name')}"
 
     for user_id in list_admin:
 
